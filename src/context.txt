@@ -1,0 +1,116 @@
+import './App.css';
+import PlacesTest from './components/PlacesTest';
+import LlmQuery from './components/LlmQuery';
+
+function App() {
+  return (
+    <>
+      <LlmQuery />
+      <PlacesTest />
+    </>
+  );
+}
+
+export default App;
+
+import { useState } from 'react';
+
+function LlmQuery() {
+  const [query, setQuery] = useState('');
+  const [response, setResponse] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleQuery = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/.netlify/functions/query-llm', {
+        method: 'POST',
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      setResponse(data.response);
+    } catch (error) {
+      console.error('Error querying LLM:', error);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Ask a question..."
+      />
+      <button onClick={handleQuery} disabled={loading}>
+        {loading ? 'Loading...' : 'Ask'}
+      </button>
+      {response && <p>{response}</p>}
+    </div>
+  );
+}
+
+export default LlmQuery;
+import React, { useState, useEffect } from 'react'
+
+const LocationTracker = () => {
+  const [location, setLocation] = useState(null)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    // Check if the browser supports Geolocation
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser.')
+      return
+    }
+
+    // Success
+    const handleSuccess = (position) => {
+
+    }
+  }
+import { useState } from 'react';
+
+function PlacesTest() {
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
+  const testPlaces = async () => {
+    console.log('Button clicked!');
+    setLoading(true);
+    
+    try {
+      console.log('Making request...');
+      const response = await fetch('/.netlify/functions/search-places', {
+        method: 'POST',
+        body: JSON.stringify({ query: 'restaurants near toronto' })
+      });
+      
+      console.log('Response status:', response.status);
+      const data = await response.json();
+      console.log('Full response:', data);
+      
+      setResults(data.results || []);
+      console.log('Results set:', data.results?.length || 0);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <button onClick={testPlaces}>Test Places API</button>
+      {loading && <p>Loading...</p>}
+      {results.map(place => (
+        <div key={place.place_id}>
+          <h3>{place.name}</h3>
+          <p>{place.formatted_address}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default PlacesTest;
