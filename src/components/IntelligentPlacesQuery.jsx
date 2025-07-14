@@ -89,39 +89,34 @@ function IntelligentPlacesQuery({ location }) {
   };
 
   return (
-    <div>
+    <div className="intelligent-query">
       <h2>Intelligent Places Query</h2>
-      <div style={{ marginBottom: '20px' }}>
+      <div className="query-input-section">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Ask about places near you..."
-          style={{ width: '300px', padding: '10px' }}
+          className="query-input"
         />
         <button 
           onClick={handleIntelligentQuery} 
           disabled={loading || !query.trim()}
-          style={{ padding: '10px 20px', marginLeft: '10px' }}
+          className="query-button"
         >
           {loading ? 'Processing...' : 'Ask'}
         </button>
       </div>
 
       {response && (
-        <div style={{ 
-          border: '1px solid #ddd', 
-          padding: '20px', 
-          marginBottom: '20px',
-          backgroundColor: '#f9f9f9'
-        }}>
+        <div className="ai-response">
           <h3>AI Response:</h3>
-          <p style={{ whiteSpace: 'pre-wrap' }}>{response}</p>
+          <p className="ai-response-text">{response}</p>
         </div>
       )}
 
       {places.length > 0 && (
-        <div>
+        <div className="places-results">
           <h3>Found Places:</h3>
           {places.map((place, index) => {
             const needsDetails = needsDetailedSearch(query);
@@ -129,32 +124,29 @@ function IntelligentPlacesQuery({ location }) {
             const amenityInfo = needsDetails ? formatAmenityData(place, relevantAmenities) : null;
             
             return (
-              <div key={index} style={{ 
-                border: '1px solid #ccc', 
-                margin: '10px 0', 
-                padding: '15px',
-                borderRadius: '5px'
-              }}>
-                <h4>{place.displayName?.text}</h4>
-                <p><strong>Address:</strong> {place.formattedAddress}</p>
-                {place.rating && <p><strong>Rating:</strong> {place.rating}</p>}
-                {place.types && <p><strong>Types:</strong> {place.types.join(', ')}</p>}
-                {place.priceLevel && <p><strong>Price Level:</strong> {'$'.repeat(place.priceLevel)}</p>}
+              <div key={index} className="place-card">
+                <h4 className="place-name">{place.displayName?.text}</h4>
+                <p className="place-info"><strong>Address:</strong> {place.formattedAddress}</p>
+                {place.rating && <p className="place-info"><strong>Rating:</strong> {place.rating}</p>}
+                {place.types && <p className="place-info"><strong>Types:</strong> {place.types.join(', ')}</p>}
+                {place.priceLevel && <p className="place-info price-level"><strong>Price Level:</strong> {'$'.repeat(place.priceLevel)}</p>}
                 {needsDetails && (
-                  <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f0f8ff', borderRadius: '3px' }}>
+                  <div className="amenities-section">
                     <strong>Amenities:</strong>
                     {amenityInfo ? (
-                      <p style={{ margin: '5px 0' }}>{amenityInfo}</p>
+                      <p className="amenities-text">{amenityInfo}</p>
                     ) : (
-                      <p style={{ margin: '5px 0', fontStyle: 'italic' }}>No specific amenity data available</p>
+                      <p className="amenities-text no-data">No specific amenity data available</p>
                     )}
-                    {place.currentOpeningHours && (
-                      <p><strong>Hours:</strong> {place.currentOpeningHours.openNow ? 'Open now' : 'Closed'}</p>
-                    )}
-                    {place.nationalPhoneNumber && <p><strong>Phone:</strong> {place.nationalPhoneNumber}</p>}
-                    {place.websiteUri && (
-                      <p><strong>Website:</strong> <a href={place.websiteUri} target="_blank" rel="noopener noreferrer">Visit</a></p>
-                    )}
+                    <div className="contact-info">
+                      {place.currentOpeningHours && (
+                        <p><strong>Hours:</strong> {place.currentOpeningHours.openNow ? 'Open now' : 'Closed'}</p>
+                      )}
+                      {place.nationalPhoneNumber && <p><strong>Phone:</strong> {place.nationalPhoneNumber}</p>}
+                      {place.websiteUri && (
+                        <p><strong>Website:</strong> <a href={place.websiteUri} target="_blank" rel="noopener noreferrer" className="website-link">Visit</a></p>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

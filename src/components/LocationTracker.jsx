@@ -44,16 +44,20 @@ const LocationTracker = ({ onLocationChange }) => {
   }
 
   return (
-    <div>
+    <div className="location-tracker">
       <h3>Location Tracker</h3>
-      <button onClick={getCurrentLocation} disabled={loading}>
+      <button 
+        className="location-button"
+        onClick={getCurrentLocation} 
+        disabled={loading}
+      >
         {loading ? 'Getting Location...' : 'Get Current Location'}
       </button>
       
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="error-message">{error}</p>}
       
       {location && (
-        <div>
+        <div className="location-info">
           <p><strong>Latitude:</strong> {location.latitude}</p>
           <p><strong>Longitude:</strong> {location.longitude}</p>
           <p><strong>Accuracy:</strong> {location.accuracy} meters</p>

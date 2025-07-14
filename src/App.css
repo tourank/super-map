@@ -1,42 +1,312 @@
-#root {
-  max-width: 1280px;
+/* ==========================================================================
+   Super Map - Main Application Styles
+   ========================================================================== */
+
+/* App Container */
+.app {
+  padding: 20px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+}
+
+.app-title {
+  text-align: center;
+  margin-bottom: 40px;
+  color: #2c3e50;
+}
+
+/* ==========================================================================
+   Layout Components
+   ========================================================================== */
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section-divider {
+  margin: 40px 0;
+  border: none;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* ==========================================================================
+   Location Tracker Styles
+   ========================================================================== */
+
+.location-tracker {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.location-tracker h3 {
+  margin-top: 0;
+  color: #495057;
+}
+
+.location-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.location-button:hover {
+  background: #0056b3;
+}
+
+.location-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.location-info {
+  margin-top: 15px;
+}
+
+.location-info p {
+  margin: 5px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   Intelligent Places Query Styles
+   ========================================================================== */
+
+.intelligent-query {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid #e9ecef;
+}
+
+.intelligent-query h2 {
+  margin-top: 0;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.query-input-section {
+  margin-bottom: 20px;
+}
+
+.query-input {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.query-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.query-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 10px;
+  transition: background-color 0.2s;
+}
+
+.query-button:hover {
+  background: #218838;
+}
+
+.query-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   AI Response Styles
+   ========================================================================== */
+
+.ai-response {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.ai-response h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.ai-response-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  color: #495057;
+}
+
+/* ==========================================================================
+   Places Results Styles
+   ========================================================================== */
+
+.places-results {
+  margin-top: 20px;
+}
+
+.places-results h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.place-card {
+  border: 1px solid #e9ecef;
+  margin: 15px 0;
+  padding: 20px;
+  border-radius: 8px;
+  background: white;
+  transition: box-shadow 0.2s;
+}
+
+.place-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.place-name {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 20px;
+}
+
+.place-info {
+  margin: 8px 0;
+  color: #495057;
+}
+
+.place-info strong {
+  color: #2c3e50;
+}
+
+.price-level {
+  color: #28a745;
+  font-weight: bold;
+}
+
+/* ==========================================================================
+   Amenities Section Styles
+   ========================================================================== */
+
+.amenities-section {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #e3f2fd;
+  border-radius: 6px;
+  border-left: 4px solid #2196f3;
+}
+
+.amenities-section strong {
+  color: #1976d2;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.amenities-text {
+  margin: 8px 0;
+  color: #424242;
+}
+
+.amenities-text.no-data {
+  font-style: italic;
+  color: #757575;
+}
+
+.contact-info {
+  margin-top: 10px;
+}
+
+.contact-info p {
+  margin: 5px 0;
+}
+
+.website-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.website-link:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .app {
+    padding: 15px;
+  }
+  
+  .query-input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .query-button {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  .place-card {
+    padding: 15px;
+  }
+  
+  .amenities-section {
+    padding: 12px;
+  }
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+.loading {
+  color: #007bff;
+  font-style: italic;
+}
+
+.hidden {
+  display: none;
+}
+
+.text-center {
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.mb-small {
+  margin-bottom: 10px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.mb-medium {
+  margin-bottom: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.mb-large {
+  margin-bottom: 30px;
 }

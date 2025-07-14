@@ -7,14 +7,14 @@ function App() {
   const [userLocation, setUserLocation] = useState(null);
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Super Map - AI-Powered Places Search</h1>
+    <div className="app">
+      <h1 className="app-title">Super Map - AI-Powered Places Search</h1>
       
-      <div style={{ marginBottom: '30px' }}>
+      <div className="section">
         <LocationTracker onLocationChange={setUserLocation} />
       </div>
 
-      <div style={{ marginBottom: '30px' }}>
+      <div className="section">
         <IntelligentPlacesQuery location={userLocation} />
       </div>
     </div>
