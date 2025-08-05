@@ -6385,6 +6385,30 @@ OpenAI.Responses = Responses;
 OpenAI.Evals = Evals;
 OpenAI.Containers = Containers;
 
+// src/constants/index.js
+var CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS"
+};
+var API_RESPONSES = {
+  success: (data) => ({
+    statusCode: 200,
+    headers: CORS_HEADERS,
+    body: JSON.stringify(data)
+  }),
+  error: (message, statusCode = 500) => ({
+    statusCode,
+    headers: CORS_HEADERS,
+    body: JSON.stringify({ error: message })
+  }),
+  options: () => ({
+    statusCode: 200,
+    headers: CORS_HEADERS,
+    body: ""
+  })
+};
+
 // netlify/functions/query-llm.js
 var openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -6392,32 +6416,20 @@ var openai = new OpenAI({
 var handler = async (event) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "OpenAI API key not configured" })
-      };
+      return API_RESPONSES.error("OpenAI API key not configured");
     }
     if (!event.body) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Request body is required" })
-      };
+      return API_RESPONSES.error("Request body is required", 400);
     }
     let parsedBody;
     try {
       parsedBody = JSON.parse(event.body);
     } catch (error) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Invalid JSON in request body" })
-      };
+      return API_RESPONSES.error("Invalid JSON in request body", 400);
     }
     const { query } = parsedBody;
     if (!query) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Query is required" })
-      };
+      return API_RESPONSES.error("Query is required", 400);
     }
     const completion = await openai.chat.completions.create({
       messages: [
@@ -6427,16 +6439,10 @@ var handler = async (event) => {
       model: "gpt-3.5-turbo",
       max_tokens: 500
     });
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ response: completion.choices[0].message.content })
-    };
+    return API_RESPONSES.success({ response: completion.choices[0].message.content });
   } catch (error) {
     console.error("OpenAI API error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: `OpenAI API error: ${error.message}` })
-    };
+    return API_RESPONSES.error(`OpenAI API error: ${error.message}`);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

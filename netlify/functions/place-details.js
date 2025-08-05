@@ -1,35 +1,25 @@
+import { API_RESPONSES } from '../../src/constants/index.js';
+
 export const handler = async (event) => {
   if (!event.body) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Request body is required' }),
-    };
+    return API_RESPONSES.error('Request body is required', 400);
   }
 
   let parsedBody;
   try {
     parsedBody = JSON.parse(event.body);
   } catch (error) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Invalid JSON in request body' }),
-    };
+    return API_RESPONSES.error('Invalid JSON in request body', 400);
   }
 
   const { placeId, fields } = parsedBody;
 
   if (!process.env.GOOGLE_PLACES_API_KEY) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Google Places API key not configured' }),
-    };
+    return API_RESPONSES.error('Google Places API key not configured');
   }
 
   if (!placeId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Place ID is required' }),
-    };
+    return API_RESPONSES.error('Place ID is required', 400);
   }
 
   try {
@@ -80,18 +70,12 @@ export const handler = async (event) => {
       throw new Error(`Places API error: ${response.status} - ${data.error?.message || 'Unknown error'}`);
     }
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ 
-        place: data,
-        status: 'OK'
-      }),
-    };
+    return API_RESPONSES.success({ 
+      place: data,
+      status: 'OK'
+    });
   } catch (error) {
     console.error('Place Details API error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
-    };
+    return API_RESPONSES.error(error.message);
   }
 };

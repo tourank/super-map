@@ -22,44 +22,68 @@ __export(search_places_exports, {
   handler: () => handler
 });
 module.exports = __toCommonJS(search_places_exports);
+
+// src/constants/index.js
+var API_CONFIG = {
+  // Google Places API
+  PLACES_SEARCH_RADIUS: 1e4,
+  // 10km radius for place searches
+  MAX_RESULTS_COUNT: 10,
+  // Maximum number of results to return
+  // Geolocation Settings
+  GEOLOCATION_TIMEOUT: 1e4,
+  // 10 seconds timeout for geolocation
+  GEOLOCATION_MAX_AGE: 6e4,
+  // 1 minute cache for location data
+  // Test Timeouts
+  TEST_TIMEOUT: 5e3
+  // 5 seconds for E2E test assertions
+};
+var CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS"
+};
+var API_RESPONSES = {
+  success: (data) => ({
+    statusCode: 200,
+    headers: CORS_HEADERS,
+    body: JSON.stringify(data)
+  }),
+  error: (message, statusCode = 500) => ({
+    statusCode,
+    headers: CORS_HEADERS,
+    body: JSON.stringify({ error: message })
+  }),
+  options: () => ({
+    statusCode: 200,
+    headers: CORS_HEADERS,
+    body: ""
+  })
+};
+
+// netlify/functions/search-places.js
 var handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST, OPTIONS"
-      },
-      body: ""
-    };
+    return API_RESPONSES.options();
   }
   if (!event.body) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Request body is required" })
-    };
+    return API_RESPONSES.error("Request body is required", 400);
   }
   let parsedBody;
   try {
     parsedBody = JSON.parse(event.body);
   } catch (error) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid JSON in request body" })
-    };
+    return API_RESPONSES.error("Invalid JSON in request body", 400);
   }
   const { query, location } = parsedBody;
   if (!process.env.GOOGLE_PLACES_API_KEY) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Google Places API key not configured" })
-    };
+    return API_RESPONSES.error("Google Places API key not configured");
   }
   try {
     const requestBody = {
       textQuery: query,
-      maxResultCount: 10
+      maxResultCount: API_CONFIG.MAX_RESULTS_COUNT
     };
     if (location && location.latitude && location.longitude) {
       requestBody.locationBias = {
@@ -68,7 +92,7 @@ var handler = async (event) => {
             latitude: location.latitude,
             longitude: location.longitude
           },
-          radius: 1e4
+          radius: API_CONFIG.PLACES_SEARCH_RADIUS
         }
       };
     }
@@ -85,24 +109,13 @@ var handler = async (event) => {
     if (!response.ok) {
       throw new Error(`Places API error: ${response.status}`);
     }
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST, OPTIONS"
-      },
-      body: JSON.stringify({
-        results: data.places || [],
-        status: "OK"
-      })
-    };
+    return API_RESPONSES.success({
+      results: data.places || [],
+      status: "OK"
+    });
   } catch (error) {
     console.error("Places API error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    };
+    return API_RESPONSES.error(error.message);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

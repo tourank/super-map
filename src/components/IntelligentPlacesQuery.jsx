@@ -38,7 +38,6 @@ function IntelligentPlacesQuery({ location }) {
       const relevantAmenities = getRelevantAmenities(query);
 
       if (needsDetails && placesResults.length > 0) {
-        console.log('Query needs detailed search for amenities:', relevantAmenities);
         
         // Get detailed information for each place
         const detailPromises = placesResults.map(async (place) => {

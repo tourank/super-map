@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { API_RESPONSES } from '../../src/constants/index.js';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -7,36 +8,24 @@ const openai = new OpenAI({
 export const handler = async (event) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'OpenAI API key not configured' }),
-      };
+      return API_RESPONSES.error('OpenAI API key not configured');
     }
 
     if (!event.body) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Request body is required' }),
-      };
+      return API_RESPONSES.error('Request body is required', 400);
     }
 
     let parsedBody;
     try {
       parsedBody = JSON.parse(event.body);
     } catch (error) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Invalid JSON in request body' }),
-      };
+      return API_RESPONSES.error('Invalid JSON in request body', 400);
     }
 
     const { query } = parsedBody;
 
     if (!query) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Query is required' }),
-      };
+      return API_RESPONSES.error('Query is required', 400);
     }
 
     const completion = await openai.chat.completions.create({
@@ -48,15 +37,9 @@ export const handler = async (event) => {
       max_tokens: 500,
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ response: completion.choices[0].message.content }),
-    };
+    return API_RESPONSES.success({ response: completion.choices[0].message.content });
   } catch (error) {
     console.error('OpenAI API error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: `OpenAI API error: ${error.message}` }),
-    };
+    return API_RESPONSES.error(`OpenAI API error: ${error.message}`);
   }
 };

@@ -22,34 +22,48 @@ __export(place_details_exports, {
   handler: () => handler
 });
 module.exports = __toCommonJS(place_details_exports);
+
+// src/constants/index.js
+var CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS"
+};
+var API_RESPONSES = {
+  success: (data) => ({
+    statusCode: 200,
+    headers: CORS_HEADERS,
+    body: JSON.stringify(data)
+  }),
+  error: (message, statusCode = 500) => ({
+    statusCode,
+    headers: CORS_HEADERS,
+    body: JSON.stringify({ error: message })
+  }),
+  options: () => ({
+    statusCode: 200,
+    headers: CORS_HEADERS,
+    body: ""
+  })
+};
+
+// netlify/functions/place-details.js
 var handler = async (event) => {
   if (!event.body) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Request body is required" })
-    };
+    return API_RESPONSES.error("Request body is required", 400);
   }
   let parsedBody;
   try {
     parsedBody = JSON.parse(event.body);
   } catch (error) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Invalid JSON in request body" })
-    };
+    return API_RESPONSES.error("Invalid JSON in request body", 400);
   }
   const { placeId, fields } = parsedBody;
   if (!process.env.GOOGLE_PLACES_API_KEY) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Google Places API key not configured" })
-    };
+    return API_RESPONSES.error("Google Places API key not configured");
   }
   if (!placeId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Place ID is required" })
-    };
+    return API_RESPONSES.error("Place ID is required", 400);
   }
   try {
     const defaultFields = [
@@ -93,19 +107,13 @@ var handler = async (event) => {
     if (!response.ok) {
       throw new Error(`Places API error: ${response.status} - ${data.error?.message || "Unknown error"}`);
     }
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        place: data,
-        status: "OK"
-      })
-    };
+    return API_RESPONSES.success({
+      place: data,
+      status: "OK"
+    });
   } catch (error) {
     console.error("Place Details API error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    };
+    return API_RESPONSES.error(error.message);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

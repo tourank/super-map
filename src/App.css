@@ -504,31 +504,3 @@ body {
   }
 }
 
-/* ==========================================================================
-   Utility Classes
-   ========================================================================== */
-
-.loading {
-  color: #007bff;
-  font-style: italic;
-}
-
-.hidden {
-  display: none;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.mb-small {
-  margin-bottom: 10px;
-}
-
-.mb-medium {
-  margin-bottom: 20px;
-}
-
-.mb-large {
-  margin-bottom: 30px;
-}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { API_CONFIG } from '../constants'
 
 const LocationTracker = ({ onLocationChange }) => {
   const [location, setLocation] = useState(null)
@@ -37,8 +38,8 @@ const LocationTracker = ({ onLocationChange }) => {
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
+        timeout: API_CONFIG.GEOLOCATION_TIMEOUT,
+        maximumAge: API_CONFIG.GEOLOCATION_MAX_AGE
       }
     )
   }

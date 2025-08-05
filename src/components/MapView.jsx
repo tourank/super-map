@@ -1,63 +1,38 @@
 import { useState } from 'react';
+import { generateSinglePlaceMapUrl, generateMultiplePlacesMapUrl } from '../utils/locationUtils';
 
 function MapView({ places, userLocation }) {
   const [showMapLinks, setShowMapLinks] = useState(false);
 
   const generateMapUrl = (place) => {
-    console.log('Place data for map:', place); // Debug logging
+    const mapUrl = generateSinglePlaceMapUrl(place);
+    if (mapUrl) return mapUrl;
     
-    // Try different location formats from Google Places API
-    let lat, lng;
-    
-    if (place.location) {
-      lat = place.location.latitude;
-      lng = place.location.longitude;
-    } else if (place.geometry?.location) {
-      lat = place.geometry.location.lat;
-      lng = place.geometry.location.lng;
-    } else if (place.lat && place.lng) {
-      lat = place.lat;
-      lng = place.lng;
-    }
-    
-    if (lat && lng) {
-      // Use exact coordinates with place name as query
-      const placeName = encodeURIComponent(place.displayName?.text || place.name || 'Location');
-      return `https://www.google.com/maps/search/${placeName}/@${lat},${lng},17z`;
-    } else {
-      // Fall back to search by name and address
-      const query = `${place.displayName?.text || place.name || ''} ${place.formattedAddress || ''}`.trim();
-      return `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
-    }
+    // Fallback to search by name and address if no coordinates found
+    const query = `${place.displayName?.text || place.name || ''} ${place.formattedAddress || ''}`.trim();
+    return `https://www.google.com/maps/search/${encodeURIComponent(query)}`;
   };
 
   const generateAllPlacesUrl = () => {
+    if (!userLocation || places.length === 0) return null;
+    
+    // Try the utility function first
+    const utilityUrl = generateMultiplePlacesMapUrl(places, userLocation);
+    if (utilityUrl) return utilityUrl;
+    
+    // Fallback to directions-based URL
     const baseUrl = 'https://www.google.com/maps/dir/';
+    const destinations = places.slice(0, 5).map(place => {
+      const coords = place.location || place.geometry?.location;
+      if (coords) {
+        const lat = coords.latitude || coords.lat;
+        const lng = coords.longitude || coords.lng;
+        if (lat && lng) return `${lat},${lng}`;
+      }
+      return encodeURIComponent(place.displayName?.text || place.formattedAddress || 'Unknown location');
+    });
     
-    if (userLocation && places.length > 0) {
-      // Create a multi-destination route
-      let destinations = places.slice(0, 5).map(place => {
-        // Try different location formats
-        let lat, lng;
-        if (place.location) {
-          lat = place.location.latitude;
-          lng = place.location.longitude;
-        } else if (place.geometry?.location) {
-          lat = place.geometry.location.lat;
-          lng = place.geometry.location.lng;
-        }
-        
-        if (lat && lng) {
-          return `${lat},${lng}`;
-        }
-        // Fallback to address/name search
-        return encodeURIComponent(place.displayName?.text || place.formattedAddress || 'Unknown location');
-      });
-      
-      return `${baseUrl}${userLocation.latitude},${userLocation.longitude}/${destinations.join('/')}`;
-    }
-    
-    return null;
+    return `${baseUrl}${userLocation.latitude},${userLocation.longitude}/${destinations.join('/')}`;
   };
 
   if (places.length === 0) {

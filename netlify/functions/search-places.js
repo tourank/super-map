@@ -1,48 +1,33 @@
+import { API_CONFIG, API_RESPONSES } from '../../src/constants/index.js';
+
 export const handler = async (event) => {
   // Handle preflight OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: ''
-    };
+    return API_RESPONSES.options();
   }
 
 
   if (!event.body) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Request body is required' }),
-    };
+    return API_RESPONSES.error('Request body is required', 400);
   }
 
   let parsedBody;
   try {
     parsedBody = JSON.parse(event.body);
   } catch (error) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Invalid JSON in request body' }),
-    };
+    return API_RESPONSES.error('Invalid JSON in request body', 400);
   }
 
   const { query, location } = parsedBody;
 
   if (!process.env.GOOGLE_PLACES_API_KEY) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Google Places API key not configured' }),
-    };
+    return API_RESPONSES.error('Google Places API key not configured');
   }
 
   try {
     const requestBody = {
       textQuery: query,
-      maxResultCount: 10
+      maxResultCount: API_CONFIG.MAX_RESULTS_COUNT
     };
 
     if (location && location.latitude && location.longitude) {
@@ -52,7 +37,7 @@ export const handler = async (event) => {
             latitude: location.latitude,
             longitude: location.longitude
           },
-          radius: 10000
+          radius: API_CONFIG.PLACES_SEARCH_RADIUS
         }
       };
     }
@@ -74,23 +59,12 @@ export const handler = async (event) => {
       throw new Error(`Places API error: ${response.status}`);
     }
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: JSON.stringify({ 
-        results: data.places || [],
-        status: 'OK'
-      }),
-    };
+    return API_RESPONSES.success({ 
+      results: data.places || [],
+      status: 'OK'
+    });
   } catch (error) {
     console.error('Places API error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
-    };
+    return API_RESPONSES.error(error.message);
   }
 };
