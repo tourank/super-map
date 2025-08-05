@@ -32,6 +32,15 @@ function IntelligentPlacesQuery({ location }) {
       });
       
       const placesData = await placesResponse.json();
+      console.log('Places API response:', placesData);
+      
+      if (placesData.error) {
+        console.error('Google API Error:', placesData);
+        setResponse(`Error: ${placesData.error}. Google said: ${JSON.stringify(placesData.googleResponse)}`);
+        setLoading(false);
+        return;
+      }
+      
       let placesResults = placesData.results || [];
 
       // Check if we need detailed amenity data
