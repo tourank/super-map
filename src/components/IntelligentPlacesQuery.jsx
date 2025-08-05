@@ -17,6 +17,9 @@ function IntelligentPlacesQuery({ location }) {
       // First, get relevant places based on the query
       const placesResponse = await fetch('/.netlify/functions/search-places', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ 
           query: query,
           location: location
@@ -38,6 +41,9 @@ function IntelligentPlacesQuery({ location }) {
           try {
             const detailResponse = await fetch('/.netlify/functions/place-details', {
               method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
               body: JSON.stringify({ placeId: place.id })
             });
             const detailData = await detailResponse.json();
@@ -77,6 +83,9 @@ function IntelligentPlacesQuery({ location }) {
 
       const llmResponse = await fetch('/.netlify/functions/query-llm', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ query: enhancedQuery }),
       });
       
