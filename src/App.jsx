@@ -8,13 +8,13 @@ function App() {
 
   return (
     <div className="app">
-      <h1 className="app-title">Super Map - AI-Powered Places Search</h1>
-      
-      <div className="section">
-        <LocationTracker onLocationChange={setUserLocation} />
+      <div className="app-header">
+        <h1 className="app-title">Super Map</h1>
+        <p className="app-subtitle">AI-powered places discovery</p>
       </div>
-
-      <div className="section">
+      
+      <div className="main-content">
+        <LocationTracker onLocationChange={setUserLocation} />
         <IntelligentPlacesQuery location={userLocation} />
       </div>
     </div>

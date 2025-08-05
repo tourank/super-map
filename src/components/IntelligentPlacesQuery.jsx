@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { needsDetailedSearch, getRelevantAmenities, formatAmenityData } from '../utils/amenityDetection';
+import MapView from './MapView';
 
 function IntelligentPlacesQuery({ location }) {
   const [query, setQuery] = useState('');
@@ -90,22 +91,36 @@ function IntelligentPlacesQuery({ location }) {
 
   return (
     <div className="intelligent-query">
-      <h2>Intelligent Places Query</h2>
       <div className="query-input-section">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ask about places near you..."
-          className="query-input"
-        />
-        <button 
-          onClick={handleIntelligentQuery} 
-          disabled={loading || !query.trim()}
-          className="query-button"
-        >
-          {loading ? 'Processing...' : 'Ask'}
-        </button>
+        <div className="input-container">
+          <textarea
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Ask about places near you..."
+            className="query-input"
+            rows={1}
+            style={{ height: 'auto' }}
+            onInput={(e) => {
+              e.target.style.height = 'auto';
+              e.target.style.height = e.target.scrollHeight + 'px';
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!loading && query.trim()) {
+                  handleIntelligentQuery();
+                }
+              }
+            }}
+          />
+          <button 
+            onClick={handleIntelligentQuery} 
+            disabled={loading || !query.trim()}
+            className="query-button"
+          >
+            {loading ? '...' : 'Ask'}
+          </button>
+        </div>
       </div>
 
       {response && (
@@ -116,43 +131,47 @@ function IntelligentPlacesQuery({ location }) {
       )}
 
       {places.length > 0 && (
-        <div className="places-results">
-          <h3>Found Places:</h3>
-          {places.map((place, index) => {
-            const needsDetails = needsDetailedSearch(query);
-            const relevantAmenities = getRelevantAmenities(query);
-            const amenityInfo = needsDetails ? formatAmenityData(place, relevantAmenities) : null;
-            
-            return (
-              <div key={index} className="place-card">
-                <h4 className="place-name">{place.displayName?.text}</h4>
-                <p className="place-info"><strong>Address:</strong> {place.formattedAddress}</p>
-                {place.rating && <p className="place-info"><strong>Rating:</strong> {place.rating}</p>}
-                {place.types && <p className="place-info"><strong>Types:</strong> {place.types.join(', ')}</p>}
-                {place.priceLevel && <p className="place-info price-level"><strong>Price Level:</strong> {'$'.repeat(place.priceLevel)}</p>}
-                {needsDetails && (
-                  <div className="amenities-section">
-                    <strong>Amenities:</strong>
-                    {amenityInfo ? (
-                      <p className="amenities-text">{amenityInfo}</p>
-                    ) : (
-                      <p className="amenities-text no-data">No specific amenity data available</p>
-                    )}
-                    <div className="contact-info">
-                      {place.currentOpeningHours && (
-                        <p><strong>Hours:</strong> {place.currentOpeningHours.openNow ? 'Open now' : 'Closed'}</p>
+        <>
+          <MapView places={places} userLocation={location} />
+          
+          <div className="places-results">
+            <h3>Found Places:</h3>
+            {places.map((place, index) => {
+              const needsDetails = needsDetailedSearch(query);
+              const relevantAmenities = getRelevantAmenities(query);
+              const amenityInfo = needsDetails ? formatAmenityData(place, relevantAmenities) : null;
+              
+              return (
+                <div key={index} className="place-card">
+                  <h4 className="place-name">{place.displayName?.text}</h4>
+                  <p className="place-info"><strong>Address:</strong> {place.formattedAddress}</p>
+                  {place.rating && <p className="place-info"><strong>Rating:</strong> {place.rating}</p>}
+                  {place.types && <p className="place-info"><strong>Types:</strong> {place.types.join(', ')}</p>}
+                  {place.priceLevel && <p className="place-info price-level"><strong>Price Level:</strong> {'$'.repeat(place.priceLevel)}</p>}
+                  {needsDetails && (
+                    <div className="amenities-section">
+                      <strong>Amenities:</strong>
+                      {amenityInfo ? (
+                        <p className="amenities-text">{amenityInfo}</p>
+                      ) : (
+                        <p className="amenities-text no-data">No specific amenity data available</p>
                       )}
-                      {place.nationalPhoneNumber && <p><strong>Phone:</strong> {place.nationalPhoneNumber}</p>}
-                      {place.websiteUri && (
-                        <p><strong>Website:</strong> <a href={place.websiteUri} target="_blank" rel="noopener noreferrer" className="website-link">Visit</a></p>
-                      )}
+                      <div className="contact-info">
+                        {place.currentOpeningHours && (
+                          <p><strong>Hours:</strong> {place.currentOpeningHours.openNow ? 'Open now' : 'Closed'}</p>
+                        )}
+                        {place.nationalPhoneNumber && <p><strong>Phone:</strong> {place.nationalPhoneNumber}</p>}
+                        {place.websiteUri && (
+                          <p><strong>Website:</strong> <a href={place.websiteUri} target="_blank" rel="noopener noreferrer" className="website-link">Visit</a></p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );

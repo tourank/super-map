@@ -51,6 +51,7 @@ const LocationTracker = ({ onLocationChange }) => {
         onClick={getCurrentLocation} 
         disabled={loading}
       >
+        <span>📍</span>
         {loading ? 'Getting Location...' : 'Get Current Location'}
       </button>
       
