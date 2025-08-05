@@ -6397,7 +6397,22 @@ var handler = async (event) => {
         body: JSON.stringify({ error: "OpenAI API key not configured" })
       };
     }
-    const { query } = JSON.parse(event.body);
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Request body is required" })
+      };
+    }
+    let parsedBody;
+    try {
+      parsedBody = JSON.parse(event.body);
+    } catch (error) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Invalid JSON in request body" })
+      };
+    }
+    const { query } = parsedBody;
     if (!query) {
       return {
         statusCode: 400,

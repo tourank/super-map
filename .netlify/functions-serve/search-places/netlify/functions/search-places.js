@@ -23,7 +23,22 @@ __export(search_places_exports, {
 });
 module.exports = __toCommonJS(search_places_exports);
 var handler = async (event) => {
-  const { query, location } = JSON.parse(event.body);
+  if (!event.body) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Request body is required" })
+    };
+  }
+  let parsedBody;
+  try {
+    parsedBody = JSON.parse(event.body);
+  } catch (error) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Invalid JSON in request body" })
+    };
+  }
+  const { query, location } = parsedBody;
   if (!process.env.GOOGLE_PLACES_API_KEY) {
     return {
       statusCode: 500,
