@@ -15,15 +15,20 @@ function IntelligentPlacesQuery({ location }) {
 
     try {
       // First, get relevant places based on the query
+      const requestBody = { 
+        query: query,
+        location: location
+      };
+      
+      console.log('Request body:', requestBody);
+      console.log('Stringified:', JSON.stringify(requestBody));
+      
       const placesResponse = await fetch('/.netlify/functions/search-places', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-          query: query,
-          location: location
-        })
+        body: JSON.stringify(requestBody)
       });
       
       const placesData = await placesResponse.json();
