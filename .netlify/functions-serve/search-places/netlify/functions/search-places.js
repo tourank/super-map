@@ -83,7 +83,7 @@ var handler = async (event) => {
       headers: {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY,
-        "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.priceLevel,places.types,places.location"
+        "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.types"
       },
       body: JSON.stringify(requestBody)
     });
@@ -91,7 +91,19 @@ var handler = async (event) => {
     const data = await response.json();
     console.log("Google API response:", JSON.stringify(data, null, 2));
     if (!response.ok) {
-      throw new Error(`Places API error: ${response.status}`);
+      return {
+        statusCode: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Methods": "POST, OPTIONS"
+        },
+        body: JSON.stringify({
+          error: `Google API error: ${response.status}`,
+          googleResponse: data,
+          requestSent: requestBody
+        })
+      };
     }
     return {
       statusCode: 200,
