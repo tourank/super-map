@@ -17,7 +17,7 @@ AI-powered places discovery application that helps you find and explore places n
 - **Frontend**: React 19 + Vite
 - **Styling**: CSS
 - **Backend**: Netlify Functions
-- **APIs**: OpenAI GPT for intelligent query processing
+- **APIs**: OpenAI GPT for intelligent query processing, Google Places for location data
 - **Testing**: Vitest (unit tests) + Playwright (e2e tests)
 
 ## Getting Started
